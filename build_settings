@@ -1,0 +1,7 @@
+#!/bin/bash
+
+name="alpine-redmine"
+port=3555
+container_port=3000
+
+args="--restart=always  -p ${port}:${container_port}"

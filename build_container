@@ -1,0 +1,68 @@
+#!/bin/sh
+
+set -e           
+
+if [[ ! -f $PWD/build_settings ]]
+then
+  echo "Cannot find ./buildsettings, create it with at least a name variable"
+  exit 127
+fi
+
+source $PWD/build_settings
+
+if [[ -z "$name" ]]
+then
+  echo "name as not been set in ./build_settings.sh"
+  exit 127
+fi
+
+sudo_cmd=sudo
+
+if groups | grep -q docker
+then
+    sudo_cmd=""
+fi
+
+$sudo_cmd docker build -t $name .
+
+if [[ $? -gt 0 ]] 
+then
+  exit $?
+fi
+
+
+echo -n "Image built, (re)create container? [Yn] "
+read answer
+
+if [[ ${answer,} == n ]]
+then
+  echo "Image created, old container kept."
+  exit 0
+fi
+
+if docker ps -a | grep -q -E "\b$name\b" 
+then
+    echo -n "Stopping and removing old container.."
+
+    $sudo_cmd docker stop $name 2>&1 > /dev/null
+    $sudo_cmd docker rm $name 2>&1 /dev/null 
+
+    echo done
+fi
+
+echo
+echo -n "Creating new container.."
+
+$sudo_cmd docker create --name $name $args $name
+
+echo done
+echo
+
+echo -n "Start new container? [Yn] "
+read answer
+
+if [[ ${answer,} != n ]]
+then
+  $sudo_cmd docker start $name
+fi
+
