@@ -4,7 +4,7 @@ set -e
 
 if [[ ! -f $PWD/build_settings ]]
 then
-  echo "Cannot find ./buildsettings, create it with at least a name variable"
+  echo "Cannot find ./build_settings, create it with at least a name variable"
   exit 127
 fi
 
@@ -12,7 +12,7 @@ source $PWD/build_settings
 
 if [[ -z "$name" ]]
 then
-  echo "name as not been set in ./build_settings.sh"
+  echo "name as not been set in ./build_settings"
   exit 127
 fi
 
